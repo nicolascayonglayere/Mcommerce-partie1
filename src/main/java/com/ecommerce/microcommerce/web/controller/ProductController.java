@@ -89,7 +89,7 @@ public class ProductController {
 	}
 
 	// Marge du produit
-	@GetMapping(value = "/AdminProduit")
+	@GetMapping(value = "/AdminProduits")
 	public Map<Product, Integer> calculerMargeProduits() {
 		Map<Product, Integer> result = new HashMap<Product, Integer>();
 		for (Product p : this.productDao.findAll()) {
@@ -97,7 +97,12 @@ public class ProductController {
 			result.put(p, marge);
 		}
 		return result;
+	}
 
+	// Liste des produits par ordre alphabetique
+	@GetMapping(value = "/ProduitsAlpha")
+	public List<Product> trierProduitsParOrdreAlphabetique() {
+		return this.productDao.findAllByOrderByNom();
 	}
 
 }
