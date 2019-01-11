@@ -23,6 +23,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.ecommerce.microcommerce.dao.ProductDao;
 import com.ecommerce.microcommerce.model.Product;
+import com.ecommerce.microcommerce.web.exceptions.ProduitGratuitException;
 import com.ecommerce.microcommerce.web.exceptions.ProduitIntrouvableException;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
@@ -43,10 +44,17 @@ public class ProductController {
 	@RequestMapping(value = "/Produits", method = RequestMethod.GET)
 	public MappingJacksonValue listeProduits() {
 		Iterable<Product> produits = this.productDao.findAll();
+		// --Exception produit gratuit
+		for (Product p : produits) {
+			if (p.getPrix() == 0) {
+				throw new ProduitGratuitException("Le produit de nom " + p.getNom() + " est GRATUIT !!");
+			}
+		}
 		SimpleBeanPropertyFilter monFiltre = SimpleBeanPropertyFilter.serializeAllExcept("prixAchat");
 		FilterProvider listDeNosFiltres = new SimpleFilterProvider().addFilter("monFiltreDynamique", monFiltre);
 		MappingJacksonValue produitsFiltres = new MappingJacksonValue(produits);
 		produitsFiltres.setFilters(listDeNosFiltres);
+
 		return produitsFiltres;
 	}
 
@@ -58,6 +66,10 @@ public class ProductController {
 		if (produit == null)
 			throw new ProduitIntrouvableException(
 					"Le produit avec l'id " + id + " est INTROUVABLE. Écran Bleu si je pouvais.");
+		// --Exception produit gratuit
+		if (produit.getPrix() == 0) {
+			throw new ProduitGratuitException("Le produit avec l'id " + id + " est GRATUIT !!");
+		}
 		return produit;
 	}
 
