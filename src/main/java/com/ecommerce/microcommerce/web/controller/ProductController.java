@@ -66,10 +66,7 @@ public class ProductController {
 		if (produit == null)
 			throw new ProduitIntrouvableException(
 					"Le produit avec l'id " + id + " est INTROUVABLE. Écran Bleu si je pouvais.");
-		// --Exception produit gratuit
-		if (produit.getPrix() == 0) {
-			throw new ProduitGratuitException("Le produit avec l'id " + id + " est GRATUIT !!");
-		}
+
 		return produit;
 	}
 
@@ -79,6 +76,10 @@ public class ProductController {
 		Product productAdded = this.productDao.save(product);
 		if (productAdded == null)
 			return ResponseEntity.noContent().build();
+		// --Exception produit gratuit
+		if (productAdded.getPrix() == 0) {
+			throw new ProduitGratuitException("Le produit avec l'id " + productAdded.getId() + " est GRATUIT !!");
+		}
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 				.buildAndExpand(productAdded.getId()).toUri();
 		return ResponseEntity.created(location).build();
